@@ -10,8 +10,6 @@ import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.gpu.CompatibilityList
 import org.tensorflow.lite.gpu.GpuDelegate
 import org.tensorflow.lite.nnapi.NnApiDelegate
-import org.tensorflow.lite.support.image.TensorImage
-import org.tensorflow.lite.support.image.ops.ResizeOp
 
 /**
  * Owner-only verifier. Tiny MobileFaceNet (192-d, int8, ~1MB).
@@ -134,11 +132,24 @@ class FaceVerifier(private val context: Context) {
 
     private fun embedRaw(interp: Interpreter, faceCrop: Bitmap, dim: Int): FloatArray? {
         return try {
-            val img = TensorImage.fromBitmap(faceCrop)
-            // Model contract: estebanuri MobileFaceNet, 112x112 float, (p-127.5)/128.
-            val resized = ResizeOp(112, 112, ResizeOp.ResizeMethod.BILINEAR).apply(img)
-            val out = Array(1) { FloatArray(dim) }
-            interp.run(resized.buffer, out)
+            val inT = interp.getInputTensor(0)
+            val outDim = interp.getOutputTensor(0).shape().last()
+            val px = Bitmap.createScaledBitmap(faceCrop, 112, 112, true)
+            val ints = IntArray(112 * 112)
+            px.getPixels(ints, 0, 112, 0, 0, 112, 112)
+            val isFloat = inT.dataType() == org.tensorflow.lite.DataType.FLOAT32
+            val buf = java.nio.ByteBuffer.allocateDirect(112 * 112 * 3 * if (isFloat) 4 else 1)
+                .order(java.nio.ByteOrder.nativeOrder())
+            for (c in ints) {
+                for (shift in intArrayOf(16, 8, 0)) {
+                    val p = (c shr shift) and 0xFF
+                    // Model contract: estebanuri MobileFaceNet, (p-127.5)/128.
+                    if (isFloat) buf.putFloat((p - 127.5f) / 128f) else buf.put(p.toByte())
+                }
+            }
+            buf.rewind()
+            val out = Array(1) { FloatArray(outDim) }
+            interp.run(buf, out)
             val v = out[0]
             var n = 0f
             for (x in v) n += x * x
