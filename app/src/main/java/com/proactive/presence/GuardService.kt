@@ -104,43 +104,37 @@ class GuardService : LifecycleService() {
 
     @androidx.camera.core.ExperimentalGetImage
     private fun onFrame(proxy: ImageProxy) {
-        try {
-            val now = System.currentTimeMillis()
-            if (now - lastTick < TICK_MS) return
-            lastTick = now
-            val media = proxy.image ?: return
-            val rot = proxy.imageInfo.rotationDegrees
-            val input = InputImage.fromMediaImage(media, rot)
-            detector.process(input)
-                .addOnSuccessListener { faces ->
-                    if (faces.isEmpty()) {
+        val now = System.currentTimeMillis()
+        val media = proxy.image
+        if (now - lastTick < TICK_MS || media == null) { proxy.close(); return }
+        lastTick = now
+        // The proxy must stay open until ML Kit and the crop are done with it.
+        detector.process(InputImage.fromMediaImage(media, proxy.imageInfo.rotationDegrees))
+            .addOnSuccessListener(exec) { faces ->
+                try {
+                    val biggest = faces.maxByOrNull { it.boundingBox.width() * it.boundingBox.height() }
+                    if (biggest == null) {
+                        Log.i("Guard", "tick: no face")
                         checkAbsent(now)
+                    } else if (!verifier.hasOwner()) {
+                        onOwnerSeen()
                     } else {
-                        // Largest face, square-cropped for the embedding.
-                        val biggest = faces.maxByOrNull {
-                            it.boundingBox.width() * it.boundingBox.height()
-                        }!!
                         val bmp = FaceCrop.fromProxy(proxy)
-                        if (bmp != null && verifier.hasOwner()) {
-                            val crop = FaceCrop.square(bmp, biggest.boundingBox)
-                            val sim = if (crop != null) verifier.similarity(crop) else null
-                            if (sim == null) {
-                                // No model yet: any face counts as owner (presence mode).
-                                onOwnerSeen()
-                            } else if (sim >= verifier.threshold) {
-                                onOwnerSeen()
-                            } else {
-                                onStranger(now)
-                            }
-                        } else {
-                            onOwnerSeen()
-                        }
+                        val crop = bmp?.let { FaceCrop.square(it, biggest.boundingBox) }
+                        val sim = crop?.let { verifier.similarity(it) }
+                        Log.i("Guard", "tick: face sim=$sim thr=${verifier.threshold}")
+                        // No model/embedding (sim null): presence mode, any face is the owner.
+                        if (sim == null || sim >= verifier.threshold) onOwnerSeen() else onStranger(now)
                     }
+                } finally {
+                    proxy.close()
                 }
-                .addOnFailureListener { checkAbsent(now) }
-        } finally {
-            proxy.close()
-        }
+            }
+            .addOnFailureListener(exec) { e ->
+                Log.w("Guard", "detect failed", e)
+                proxy.close()
+                checkAbsent(now)
+            }
     }
 
     private fun onOwnerSeen() {
