@@ -20,13 +20,10 @@ jobs:
           java-version: 17
           cache: gradle
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          packages: platform-tools "platforms;android-36" "build-tools;36.0.0"
-
-      - name: Accept licenses
-        run: yes | sdkmanager --licenses
+      - name: Ensure Android packages
+        run: |
+          yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
+          "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0"
 
       - name: Build debug APK
         run: ./gradlew assembleDebug --stacktrace
@@ -53,13 +50,10 @@ jobs:
           java-version: 17
           cache: gradle
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          packages: platform-tools "platforms;android-36" "build-tools;36.0.0"
-
-      - name: Accept licenses
-        run: yes | sdkmanager --licenses
+      - name: Ensure Android packages
+        run: |
+          yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
+          "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0"
 
       - name: Restore upload keystore (GitHub Secret, never in git)
         run: |
