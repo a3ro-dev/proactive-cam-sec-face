@@ -34,6 +34,8 @@ class GuardService : LifecycleService() {
         const val ABSENT_TIMEOUT_MS = 15_000L
         const val TICK_MS = 5_000L
         const val STRANGER_STRIKES = 2
+
+        @Volatile var running = false
     }
 
     private val exec = Executors.newSingleThreadExecutor()
@@ -55,6 +57,7 @@ class GuardService : LifecycleService() {
 
     override fun onCreate() {
         super.onCreate()
+        running = true
         verifier = FaceVerifier(this)
         startForeground(1, notif())
         val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
@@ -187,6 +190,7 @@ class GuardService : LifecycleService() {
     }
 
     override fun onDestroy() {
+        running = false
         try { wakeLock?.let { if (it.isHeld) it.release() } } catch (_: Exception) {}
         try { detector.close() } catch (_: Exception) {}
         verifier.close()

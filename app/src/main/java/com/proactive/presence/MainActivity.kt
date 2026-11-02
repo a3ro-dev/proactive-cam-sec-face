@@ -21,7 +21,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var statusText: TextView
     private lateinit var detailText: TextView
     private lateinit var eventText: TextView
-    private var guarding = false
 
     private val events = object : BroadcastReceiver() {
         override fun onReceive(c: Context?, i: Intent?) {
@@ -37,6 +36,24 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    // ColorOS/AOSP DeviceAdminAdd needs a calling package, so it must be
+    // started for a result, not with a bare startActivity.
+    private val adminResult = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+    ) {
+        val on = isAdminOn()
+        Toast.makeText(
+            this,
+            if (on) "Lock permission on" else "Lock permission still off",
+            Toast.LENGTH_SHORT
+        ).show()
+        refreshStatus()
+    }
+
+    private fun isAdminOn(): Boolean =
+        getSystemService(DevicePolicyManager::class.java)
+            .isAdminActive(ComponentName(this, GuardAdminReceiver::class.java))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,6 +98,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun refreshStatus() {
         val hasOwner = OwnerStore.exists(this)
+        findViewById<Button>(R.id.toggleButton).text =
+            if (GuardService.running) "Stop guard" else "Start guard"
+        findViewById<Button>(R.id.adminButton).text =
+            if (isAdminOn()) "Lock permission on ✓" else "Enable lock permission"
+        statusText.text = if (GuardService.running) "Watching." else "Ready."
         detailText.text = if (hasOwner) {
             val engine = try {
                 FaceVerifier(this).also { it.close() }
@@ -88,7 +110,8 @@ class MainActivity : AppCompatActivity() {
             } catch (_: Exception) {
                 "auto"
             }
-            "Owner profile loaded · engine $engine. Grant camera + lock, then Start."
+            "Owner profile loaded · engine $engine." +
+                if (isAdminOn()) "" else " Enable lock permission, then Start."
         } else {
             "No face profile yet. Run setup — 30 seconds, on this phone."
         }
@@ -101,7 +124,7 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Lock permission already on", Toast.LENGTH_SHORT).show()
             return
         }
-        startActivity(
+        adminResult.launch(
             Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
                 putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, admin)
                 putExtra(
@@ -134,15 +157,22 @@ class MainActivity : AppCompatActivity() {
             )
             return
         }
-        guarding = !guarding
-        if (guarding) {
-            ContextCompat.startForegroundService(this, Intent(this, GuardService::class.java))
-            findViewById<Button>(R.id.toggleButton).text = "Stop guard"
-            statusText.text = "Watching."
-        } else {
+        if (GuardService.running) {
             stopService(Intent(this, GuardService::class.java))
-            findViewById<Button>(R.id.toggleButton).text = "Start guard"
+            GuardService.running = false
             statusText.text = "Paused."
+        } else {
+            if (!isAdminOn()) {
+                // A guard that cannot lock is a camera with extra steps.
+                Toast.makeText(this, "Enable lock permission first", Toast.LENGTH_SHORT).show()
+                requestAdmin()
+                return
+            }
+            ContextCompat.startForegroundService(this, Intent(this, GuardService::class.java))
+            GuardService.running = true
+            statusText.text = "Watching."
         }
+        findViewById<Button>(R.id.toggleButton).text =
+            if (GuardService.running) "Stop guard" else "Start guard"
     }
 }

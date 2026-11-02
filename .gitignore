@@ -11,3 +11,4 @@ design/shots/
 .eden/
 .agents/
 tool-outputs/
+.tmp/
