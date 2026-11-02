@@ -55,6 +55,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
+    implementation("androidx.lifecycle:lifecycle-service:2.8.3")
 
     // Camera (front-only, low-res analysis, no preview while guarding)
     implementation("androidx.camera:camera-core:1.3.4")
@@ -69,6 +70,7 @@ dependencies {
 
     // Stage 2: owner embedding, NNAPI delegate routes to MediaTek APU
     implementation("org.tensorflow:tensorflow-lite:2.14.0")
+    implementation("org.tensorflow:tensorflow-lite-gpu:2.14.0")
     implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
     implementation("org.tensorflow:tensorflow-lite-select-tf-ops:2.14.0")
 }
