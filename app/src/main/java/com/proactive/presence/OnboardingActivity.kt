@@ -4,6 +4,8 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
@@ -35,13 +37,22 @@ import java.util.concurrent.Executors
 class OnboardingActivity : AppCompatActivity() {
 
     private val prompts = listOf(
-        "Glasses on. Look at the screen.",
-        "Glasses off. Keep looking.",
-        "Move closer. Fill the frame.",
-        "Move back. Slow turn left.",
-        "Slow turn right. Almost there.",
-        "Look down, then up. Hold it."
+        "Glasses on. Stare it down.",
+        "Glasses off. There you are.",
+        "Closer. Fill the frame.",
+        "Back up. Slow look left.",
+        "Slow look right. Hold it.",
+        "Chin up, chin down. Home straight."
     )
+    private val moveIds = listOf(R.id.move0, R.id.move1, R.id.move2, R.id.move3, R.id.move4, R.id.move5)
+    private var lastMove = -1
+
+    private fun tickHaptic() {
+        try {
+            val v = getSystemService(Vibrator::class.java)
+            v.vibrate(VibrationEffect.createOneShot(18, VibrationEffect.DEFAULT_AMPLITUDE))
+        } catch (_: Exception) {}
+    }
 
     private lateinit var verifier: FaceVerifier
     private val bg = Executors.newSingleThreadExecutor()
@@ -278,10 +289,25 @@ class OnboardingActivity : AppCompatActivity() {
 
     private fun tick() {
         if (!ticking) return
-        val prompt = prompts[((30 - secondsLeft) / 5).coerceIn(0, prompts.size - 1)]
-        findViewById<TextView>(R.id.capturePrompt).text = prompt
+        val move = ((30 - secondsLeft) / 5).coerceIn(0, prompts.size - 1)
+        findViewById<TextView>(R.id.capturePrompt).text = prompts[move]
         findViewById<TextView>(R.id.captureTimer).text = "0:${"%02d".format(secondsLeft)} left"
         findViewById<ProgressBar>(R.id.captureProgress).progress = 30 - secondsLeft
+        if (move != lastMove) {
+            lastMove = move
+            tickHaptic()
+            for (i in moveIds.indices) {
+                val row = findViewById<TextView>(moveIds[i])
+                when {
+                    i < move -> {
+                        row.setTextColor(0xFF9DB4E8.toInt())
+                        if (!row.text.startsWith("✓")) row.text = "✓ ${row.text}"
+                    }
+                    i == move -> row.setTextColor(0xFFFFFFFF.toInt())
+                    else -> row.setTextColor(0xFF7E93C9.toInt())
+                }
+            }
+        }
         if (secondsLeft <= 0) {
             try { recording?.stop() } catch (_: Exception) {}
             recording = null

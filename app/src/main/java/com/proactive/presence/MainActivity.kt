@@ -27,8 +27,8 @@ class MainActivity : AppCompatActivity() {
         override fun onReceive(c: Context?, i: Intent?) {
             when (i?.action) {
                 "com.proactive.presence.OWNER_SEEN" -> {
-                    statusText.text = "You, verified just now"
-                    detailText.text = "Guard running. Leave for 15s and it locks."
+                    statusText.text = "You."
+                    detailText.text = "Verified just now. Leave for 15s and the tide goes out."
                 }
                 "com.proactive.presence.LOCKED" -> {
                     val r = i.getStringExtra("reason") ?: "locked"
@@ -138,11 +138,11 @@ class MainActivity : AppCompatActivity() {
         if (guarding) {
             ContextCompat.startForegroundService(this, Intent(this, GuardService::class.java))
             findViewById<Button>(R.id.toggleButton).text = "Stop guard"
-            statusText.text = "Watching quietly"
+            statusText.text = "Watching."
         } else {
             stopService(Intent(this, GuardService::class.java))
             findViewById<Button>(R.id.toggleButton).text = "Start guard"
-            statusText.text = "Paused"
+            statusText.text = "Paused."
         }
     }
 }

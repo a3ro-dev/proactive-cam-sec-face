@@ -17,7 +17,7 @@ import json
 import cv2
 import numpy as np
 
-IMG = 160
+IMG = 112  # must match the bundled model (estebanuri MobileFaceNet)
 
 def load_model(path):
     try:

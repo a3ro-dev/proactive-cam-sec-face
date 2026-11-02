@@ -135,7 +135,8 @@ class FaceVerifier(private val context: Context) {
     private fun embedRaw(interp: Interpreter, faceCrop: Bitmap, dim: Int): FloatArray? {
         return try {
             val img = TensorImage.fromBitmap(faceCrop)
-            val resized = ResizeOp(160, 160, ResizeOp.ResizeMethod.BILINEAR).apply(img)
+            // Model contract: estebanuri MobileFaceNet, 112x112 float, (p-127.5)/128.
+            val resized = ResizeOp(112, 112, ResizeOp.ResizeMethod.BILINEAR).apply(img)
             val out = Array(1) { FloatArray(dim) }
             interp.run(resized.buffer, out)
             val v = out[0]
