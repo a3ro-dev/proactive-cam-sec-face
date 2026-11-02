@@ -13,6 +13,10 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "0.1"
+        // Real phones are ARM; x86 is emulator-only. Halves native .so weight.
+        ndk {
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+        }
     }
 
     // CI release signing: keystore lives only in GitHub Secrets, never in git.
@@ -74,5 +78,4 @@ dependencies {
     implementation("org.tensorflow:tensorflow-lite:2.14.0")
     implementation("org.tensorflow:tensorflow-lite-gpu:2.14.0")
     implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
-    implementation("org.tensorflow:tensorflow-lite-select-tf-ops:2.14.0")
 }
