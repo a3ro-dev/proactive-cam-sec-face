@@ -31,6 +31,21 @@ C:\Users\akshat\AppData\Local\Android\Sdk\platform-tools\adb.exe install -r app\
 ```
 In app: Enable lock permission → allow Camera → Start guard.
 
+## Security model
+- Face profile encrypted at rest (AES-256-GCM, Android Keystore,
+  hardware-backed where present). `allowBackup=false`, so it never leaves
+  the device. The 30s enrollment video is deleted the moment the profile
+  is built — the embedding is all we keep.
+- Guard broadcasts are explicit to this package; no other app can listen
+  to or spoof presence state. The receiver is `RECEIVER_NOT_EXPORTED`.
+- Updates install only over the same signature (our upload key, kept in
+  GitHub Secrets, never in git) — a tampered APK cannot replace this app.
+- No analytics, no accounts, no servers. The only network calls are
+  GitHub release checks over HTTPS for OTA.
+- Permissions, each with one job: Camera (see you), lock-admin (lock for
+  you), wake-lock (hold the screen while you look), biometric (system
+  unlock), install-packages (OTA self-update), internet (OTA check only).
+
 ## Battery / heat budget
 Target <1%/hr: 640×480, 1 frame/5s, embedding only on face, NNAPI, no preview.
 If it ever feels warm, raise `TICK_MS` to 8000 in `GuardService.kt`.

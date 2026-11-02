@@ -85,7 +85,8 @@ object EnrollHelper {
                 if (dot < min) min = dot
                 sum += dot
             }
-            File(context.filesDir, "owner.json").writeText(
+            OwnerStore.write(
+                context,
                 JSONObject()
                     .put("mean", org.json.JSONArray(mean.toList()))
                     .put("threshold", 0.62)
@@ -94,6 +95,8 @@ object EnrollHelper {
                     .toString()
             )
             verifier.reload()
+            // The raw video has served its purpose; the profile is all we keep.
+            try { File(videoPath).delete() } catch (_: Exception) {}
             return Result(vecs.size, min, sum / vecs.size)
         } finally {
             try { detector.close() } catch (_: Exception) {}

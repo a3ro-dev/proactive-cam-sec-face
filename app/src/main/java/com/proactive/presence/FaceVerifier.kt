@@ -3,7 +3,6 @@ package com.proactive.presence
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
-import java.io.File
 import kotlin.math.sqrt
 import kotlin.system.measureNanoTime
 import org.json.JSONObject
@@ -43,21 +42,20 @@ class FaceVerifier(private val context: Context) {
 
     // ---------- owner profile ----------
 
-    fun hasOwner(): Boolean = ownerMean != null
+    fun hasOwner(): Boolean = ownerMean != null && OwnerStore.exists(context)
 
     fun reload() = loadOwnerVector()
 
     private fun loadOwnerVector() {
-        val f = File(context.filesDir, "owner.json")
         ownerMean = null
-        if (!f.exists()) return
         try {
-            val o = JSONObject(f.readText())
+            val raw = OwnerStore.read(context) ?: return
+            val o = JSONObject(raw)
             threshold = o.optDouble("threshold", 0.62).toFloat()
             val arr = o.getJSONArray("mean")
             ownerMean = FloatArray(arr.length()) { i -> arr.getDouble(i).toFloat() }
         } catch (e: Exception) {
-            Log.w("Verifier", "owner.json unreadable", e)
+            Log.w("Verifier", "owner profile unreadable", e)
         }
     }
 

@@ -64,6 +64,8 @@ dependencies {
     // Onboarding only: guided 30s enrollment video + live preview
     implementation("androidx.camera:camera-video:1.3.4")
     implementation("androidx.camera:camera-view:1.3.4")
+    // Encrypted face profile at rest (AES-256-GCM, hardware-backed key)
+    implementation("androidx.security:security-crypto:1.0.0")
 
     // Stage 1: tiny on-device face presence (CPU, ~ms on MT6897)
     implementation("com.google.mlkit:face-detection:16.1.7")

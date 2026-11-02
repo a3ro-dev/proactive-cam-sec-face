@@ -148,7 +148,7 @@ class GuardService : LifecycleService() {
             val wl = wakeLock
             if (wl != null && !wl.isHeld) wl.acquire(30_000L)
         } catch (_: Exception) {}
-        sendBroadcast(Intent("com.proactive.presence.OWNER_SEEN"))
+        sendBroadcast(Intent("com.proactive.presence.OWNER_SEEN").setPackage(packageName))
     }
 
     private fun checkAbsent(now: Long) {
@@ -172,7 +172,11 @@ class GuardService : LifecycleService() {
             val admin = ComponentName(this, GuardAdminReceiver::class.java)
             if (dpm.isAdminActive(admin)) {
                 dpm.lockNow()
-                sendBroadcast(Intent("com.proactive.presence.LOCKED").putExtra("reason", reason))
+                sendBroadcast(
+                    Intent("com.proactive.presence.LOCKED")
+                        .putExtra("reason", reason)
+                        .setPackage(packageName)
+                )
                 // Reset so we don't spam lock calls.
                 lastOwnerSeen = System.currentTimeMillis()
                 strangerStrikes = 0

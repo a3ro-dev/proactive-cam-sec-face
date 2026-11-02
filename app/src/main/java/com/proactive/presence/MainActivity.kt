@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         getSharedPreferences("presence_ota", MODE_PRIVATE).getBoolean("onboarded", false)
 
     private fun refreshStatus() {
-        val hasOwner = java.io.File(filesDir, "owner.json").exists()
+        val hasOwner = OwnerStore.exists(this)
         detailText.text = if (hasOwner) {
             val engine = try {
                 FaceVerifier(this).also { it.close() }
