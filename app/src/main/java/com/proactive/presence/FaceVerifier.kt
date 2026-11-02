@@ -33,9 +33,16 @@ class FaceVerifier(private val context: Context) {
     var threshold: Float = 0.62f
         private set
 
+    // The interpreter (model load + NNAPI compile) takes seconds, so it is built
+    // on first use, never in the constructor: callers construct on the UI thread.
+    private var ready = false
+
     init {
         loadOwnerVector()
-        configure(AccelStore.get(context), silent = true)
+    }
+
+    private fun ensureReady() {
+        if (!ready) configure(AccelStore.get(context), silent = true)
     }
 
     // ---------- owner profile ----------
@@ -69,6 +76,7 @@ class FaceVerifier(private val context: Context) {
     }
 
     fun configure(accel: Accel, silent: Boolean = false) {
+        ready = true
         close()
         val order = when (accel) {
             Accel.NPU -> listOf(Accel.NPU, Accel.GPU, Accel.CPU)
@@ -113,6 +121,7 @@ class FaceVerifier(private val context: Context) {
 
     /** Mean ms per inference over [runs] runs. Null when no model. */
     fun benchmark(runs: Int = 8): Double? {
+        ensureReady()
         val interp = interpreter ?: return null
         val dim = 192
         val probe = Bitmap.createBitmap(160, 160, Bitmap.Config.ARGB_8888)
@@ -126,6 +135,7 @@ class FaceVerifier(private val context: Context) {
 
     /** Raw 192-d embedding, or null. Used by guard and enrollment. */
     fun embed(faceCrop: Bitmap): FloatArray? {
+        ensureReady()
         val interp = interpreter ?: return null
         return embedRaw(interp, faceCrop, ownerMean?.size ?: 192)
     }

@@ -104,12 +104,7 @@ class MainActivity : AppCompatActivity() {
             if (isAdminOn()) "Lock permission on ✓" else "Enable lock permission"
         statusText.text = if (GuardService.running) "Watching." else "Ready."
         detailText.text = if (hasOwner) {
-            val engine = try {
-                FaceVerifier(this).also { it.close() }
-                AccelStore.get(this).name
-            } catch (_: Exception) {
-                "auto"
-            }
+            val engine = AccelStore.get(this).name
             "Owner profile loaded · engine $engine." +
                 if (isAdminOn()) "" else " Enable lock permission, then Start."
         } else {
