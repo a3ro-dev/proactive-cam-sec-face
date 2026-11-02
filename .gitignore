@@ -1,0 +1,13 @@
+# .gitignore — Presence Guard
+local.properties
+*.jks
+*.keystore
+.gradle/
+build/
+app/build/
+design/shots/
+.muse/
+.hg/
+.eden/
+.agents/
+tool-outputs/
