@@ -15,6 +15,19 @@ android {
         versionName = "0.1"
     }
 
+    // CI release signing: keystore lives only in GitHub Secrets, never in git.
+    val keystorePath = System.getenv("KEYSTORE_PATH")
+    if (keystorePath != null) {
+        signingConfigs {
+            create("ci") {
+                storeFile = file(keystorePath)
+                storePassword = System.getenv("ANDROID_KEY_PASSWORD")
+                keyAlias = System.getenv("ANDROID_KEY_ALIAS")
+                keyPassword = System.getenv("ANDROID_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -22,6 +35,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            if (keystorePath != null) signingConfig = signingConfigs.getByName("ci")
         }
     }
     compileOptions {
@@ -46,6 +60,9 @@ dependencies {
     implementation("androidx.camera:camera-core:1.3.4")
     implementation("androidx.camera:camera-camera2:1.3.4")
     implementation("androidx.camera:camera-lifecycle:1.3.4")
+    // Onboarding only: guided 30s enrollment video + live preview
+    implementation("androidx.camera:camera-video:1.3.4")
+    implementation("androidx.camera:camera-view:1.3.4")
 
     // Stage 1: tiny on-device face presence (CPU, ~ms on MT6897)
     implementation("com.google.mlkit:face-detection:16.1.7")

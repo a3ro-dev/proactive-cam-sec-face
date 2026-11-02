@@ -7,15 +7,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -47,8 +46,14 @@ class MainActivity : AppCompatActivity() {
         eventText = findViewById(R.id.eventText)
 
         findViewById<Button>(R.id.adminButton).setOnClickListener { requestAdmin() }
-        findViewById<Button>(R.id.enrollButton).setOnClickListener { pickOwnerJson() }
+        findViewById<Button>(R.id.enrollButton).setOnClickListener {
+            startActivity(Intent(this, OnboardingActivity::class.java))
+        }
         findViewById<Button>(R.id.toggleButton).setOnClickListener { toggle() }
+        findViewById<Button>(R.id.updateButton).setOnClickListener {
+            UpdateChecker.check(this, silent = false)
+        }
+        findViewById<Button>(R.id.aboutButton).setOnClickListener { about() }
 
         ContextCompat.registerReceiver(
             this, events,
@@ -58,15 +63,34 @@ class MainActivity : AppCompatActivity() {
             },
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
+
+        if (!onboarded()) {
+            startActivity(Intent(this, OnboardingActivity::class.java))
+        }
+        refreshStatus()
+        UpdateChecker.autoCheck(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
         refreshStatus()
     }
 
+    private fun onboarded(): Boolean =
+        getSharedPreferences("presence_ota", MODE_PRIVATE).getBoolean("onboarded", false)
+
     private fun refreshStatus() {
-        val hasOwner = File(filesDir, "owner.json").exists()
+        val hasOwner = java.io.File(filesDir, "owner.json").exists()
         detailText.text = if (hasOwner) {
-            "Owner profile loaded. Grant camera + lock, then Start."
+            val engine = try {
+                FaceVerifier(this).also { it.close() }
+                AccelStore.get(this).name
+            } catch (_: Exception) {
+                "auto"
+            }
+            "Owner profile loaded · engine $engine. Grant camera + lock, then Start."
         } else {
-            "No owner profile yet. Run tools/enroll.py on your video, then Import owner.json."
+            "No face profile yet. Run setup — 30 seconds, on this phone."
         }
     }
 
@@ -88,30 +112,17 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun pickOwnerJson() {
-        startActivityForResult(
-            Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                type = "application/json"
-                addCategory(Intent.CATEGORY_OPENABLE)
-            }, 42
-        )
-    }
-
-    @Deprecated("saf")
-    override fun onActivityResult(req: Int, res: Int, data: Intent?) {
-        super.onActivityResult(req, res, data)
-        if (req == 42 && res == RESULT_OK) {
-            val uri: Uri = data?.data ?: return
-            try {
-                contentResolver.openInputStream(uri)?.use { ins ->
-                    File(filesDir, "owner.json").outputStream().use { ins.copyTo(it) }
-                }
-                Toast.makeText(this, "Owner profile imported", Toast.LENGTH_SHORT).show()
-                refreshStatus()
-            } catch (e: Exception) {
-                Toast.makeText(this, "Import failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        }
+    private fun about() {
+        AlertDialog.Builder(this)
+            .setTitle("Presence Guard")
+            .setMessage(
+                "A quiet on-device guard. Stays awake for you, locks for anyone else.\n\n" +
+                    "Made by Akshat Kushwaha — AI systems engineer.\n" +
+                    "a3ro.dev · github.com/a3ro-dev\n\n" +
+                    "MIT licensed. Source on GitHub."
+            )
+            .setPositiveButton("Close", null)
+            .show()
     }
 
     private fun toggle() {

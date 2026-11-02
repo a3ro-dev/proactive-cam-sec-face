@@ -29,7 +29,7 @@
         android:id="@+id/enrollButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Import owner.json from video" />
+        android:text="Setup · 30s face video" />
 
     <Button
         android:id="@+id/adminButton"
@@ -44,6 +44,27 @@
         android:layout_height="72dp"
         android:layout_marginTop="8dp"
         android:text="Start guard" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/updateButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Updates" />
+
+        <Button
+            android:id="@+id/aboutButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="About" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/eventText"

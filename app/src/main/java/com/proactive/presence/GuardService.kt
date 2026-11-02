@@ -113,10 +113,13 @@ class GuardService : LifecycleService() {
                     if (faces.isEmpty()) {
                         checkAbsent(now)
                     } else {
-                        // Crop first (largest) face to 160px for embedding.
-                        val bmp = proxy.toBitmap()
+                        // Largest face, square-cropped for the embedding.
+                        val biggest = faces.maxByOrNull {
+                            it.boundingBox.width() * it.boundingBox.height()
+                        }!!
+                        val bmp = FaceCrop.fromProxy(proxy)
                         if (bmp != null && verifier.hasOwner()) {
-                            val crop = cropFace(bmp, faces[0].boundingBox)
+                            val crop = FaceCrop.square(bmp, biggest.boundingBox)
                             val sim = if (crop != null) verifier.similarity(crop) else null
                             if (sim == null) {
                                 // No model yet: any face counts as owner (presence mode).
@@ -185,53 +188,5 @@ class GuardService : LifecycleService() {
         verifier.close()
         exec.shutdownNow()
         super.onDestroy()
-    }
-
-    // --- small bitmap helpers (kept local to avoid extra files) ---
-    private fun ImageProxy.toBitmap(): Bitmap? {
-        return try {
-            val y = planes[0].buffer
-            val u = planes[1].buffer
-            val v = planes[2].buffer
-            val ySize = y.remaining()
-            val uSize = u.remaining()
-            val vSize = v.remaining()
-            val nv21 = ByteArray(ySize + uSize + vSize)
-            y.get(nv21, 0, ySize)
-            v.get(nv21, ySize, vSize)
-            u.get(nv21, ySize + vSize, uSize)
-            val yuv = android.graphics.YuvImage(
-                nv21, android.graphics.ImageFormat.NV21, width, height, null
-            )
-            val out = java.io.ByteArrayOutputStream()
-            yuv.compressToJpeg(android.graphics.Rect(0, 0, width, height), 80, out)
-            val bytes = out.toByteArray()
-            var bmp = android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-            val rot = imageInfo.rotationDegrees
-            if (rot != 0 && bmp != null) {
-                val m = android.graphics.Matrix().apply { postRotate(rot.toFloat()) }
-                bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.width, bmp.height, m, true)
-            }
-            bmp
-        } catch (_: Exception) {
-            null
-        }
-    }
-
-    private fun cropFace(bmp: Bitmap, box: android.graphics.Rect): Bitmap? {
-        return try {
-            val l = box.left.coerceIn(0, bmp.width - 1)
-            val t = box.top.coerceIn(0, bmp.height - 1)
-            val r = box.right.coerceIn(l + 1, bmp.width)
-            val b = box.bottom.coerceIn(t + 1, bmp.height)
-            val w = (r - l).coerceAtLeast(16)
-            val h = (b - t).coerceAtLeast(16)
-            val sq = kotlin.math.max(w, h)
-            val cx = (l + w / 2).coerceIn(sq / 2, bmp.width - sq / 2)
-            val cy = (t + h / 2).coerceIn(sq / 2, bmp.height - sq / 2)
-            Bitmap.createBitmap(bmp, cx - sq / 2, cy - sq / 2, sq, sq)
-        } catch (_: Exception) {
-            null
-        }
     }
 }

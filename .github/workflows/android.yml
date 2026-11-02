@@ -57,8 +57,19 @@ jobs:
       - name: Accept licenses
         run: yes | sdkmanager --licenses
 
-      - name: Build release APK
+      - name: Restore upload keystore (GitHub Secret, never in git)
+        run: |
+          echo "$ANDROID_KEYSTORE_B64" | base64 -d > /tmp/presence.jks
+          test -s /tmp/presence.jks
+        env:
+          ANDROID_KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+
+      - name: Build signed release APK
         run: ./gradlew assembleRelease --stacktrace
+        env:
+          KEYSTORE_PATH: /tmp/presence.jks
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
 
       - name: Publish GitHub Release with APK (OTA source)
         uses: softprops/action-gh-release@v2

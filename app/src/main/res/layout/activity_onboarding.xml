@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/tide"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Step 1: welcome -->
+        <LinearLayout
+            android:id="@+id/stepWelcome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TIDE · SETUP 1 OF 3"
+                android:textColor="#D6DEFA"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.2" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="Fill the tide with only you."
+                android:textColor="#FFFFFF"
+                android:textSize="40sp"
+                android:textStyle="bold"
+                android:lineSpacingExtra="2dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Thirty seconds of video in daylight. Glasses on, glasses off, near, far. Nothing leaves this phone."
+                android:textColor="#D6DEFA"
+                android:textSize="17sp" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="48dp" />
+
+            <Button
+                android:id="@+id/btnWelcomeNext"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:backgroundTint="#FFFFFF"
+                android:text="Begin"
+                android:textColor="@color/tideDeep" />
+        </LinearLayout>
+
+        <!-- Step 2: engine -->
+        <LinearLayout
+            android:id="@+id/stepEngine"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TIDE · SETUP 2 OF 3"
+                android:textColor="#D6DEFA"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.2" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="Pick the engine."
+                android:textColor="#FFFFFF"
+                android:textSize="34sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/socText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="#D6DEFA"
+                android:textSize="15sp" />
+
+            <RadioGroup
+                android:id="@+id/engineGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <RadioButton
+                    android:id="@+id/rbAuto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Auto (recommended)"
+                    android:textColor="#FFFFFF"
+                    android:textSize="17sp" />
+
+                <RadioButton
+                    android:id="@+id/rbNpu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="NPU · NNAPI"
+                    android:textColor="#FFFFFF"
+                    android:textSize="17sp" />
+
+                <RadioButton
+                    android:id="@+id/rbGpu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="GPU"
+                    android:textColor="#FFFFFF"
+                    android:textSize="17sp" />
+
+                <RadioButton
+                    android:id="@+id/rbCpu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="CPU"
+                    android:textColor="#FFFFFF"
+                    android:textSize="17sp" />
+            </RadioGroup>
+
+            <TextView
+                android:id="@+id/benchText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textColor="#D6DEFA"
+                android:textSize="13sp"
+                android:fontFamily="monospace" />
+
+            <TextView
+                android:id="@+id/verdictText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnBench"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="#00000000"
+                android:text="Test speed"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:id="@+id/btnRecommend"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="@color/amber"
+                android:text="Use my NPU"
+                android:textColor="#1A1200"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnEngineNext"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="#FFFFFF"
+                android:text="Continue"
+                android:textColor="@color/tideDeep" />
+        </LinearLayout>
+
+        <!-- Step 3: capture -->
+        <LinearLayout
+            android:id="@+id/stepCapture"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TIDE · SETUP 3 OF 3"
+                android:textColor="#D6DEFA"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.2" />
+
+            <TextView
+                android:id="@+id/capturePrompt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="Glasses on. Look at the screen."
+                android:textColor="#FFFFFF"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/captureTimer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="0:30 left"
+                android:textColor="#D6DEFA"
+                android:textSize="15sp"
+                android:fontFamily="monospace" />
+
+            <androidx.camera.view.PreviewView
+                android:id="@+id/preview"
+                android:layout_width="match_parent"
+                android:layout_height="320dp"
+                android:layout_marginTop="16dp" />
+
+            <ProgressBar
+                android:id="@+id/captureProgress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:max="30"
+                android:progress="0"
+                android:progressTint="@color/amber" />
+
+            <Button
+                android:id="@+id/btnRecord"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="#FFFFFF"
+                android:text="Start 30s video"
+                android:textColor="@color/tideDeep" />
+        </LinearLayout>
+
+        <!-- Step 4: building -->
+        <LinearLayout
+            android:id="@+id/stepBuilding"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:text="Reading the tide."
+                android:textColor="#FFFFFF"
+                android:textSize="34sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/buildingText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Finding faces…"
+                android:textColor="#D6DEFA"
+                android:textSize="15sp" />
+
+            <ProgressBar
+                android:id="@+id/buildingProgress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:max="60"
+                android:progress="0"
+                android:progressTint="#FFFFFF" />
+        </LinearLayout>
+
+        <!-- Step 5: done -->
+        <LinearLayout
+            android:id="@+id/stepDone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:text="The tide knows you."
+                android:textColor="#FFFFFF"
+                android:textSize="34sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/doneText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="#D6DEFA"
+                android:textSize="15sp" />
+
+            <Button
+                android:id="@+id/btnDone"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="24dp"
+                android:backgroundTint="#FFFFFF"
+                android:text="Start guarding"
+                android:textColor="@color/tideDeep" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

@@ -1,4 +1,7 @@
 <resources>
     <color name="accent">#2E6B34</color>
     <color name="danger">#B3261E</color>
+    <color name="tide">#1B44B4</color>
+    <color name="tideDeep">#12295F</color>
+    <color name="amber">#FFB02E</color>
 </resources>
