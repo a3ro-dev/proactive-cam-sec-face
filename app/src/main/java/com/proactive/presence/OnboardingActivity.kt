@@ -104,10 +104,12 @@ class OnboardingActivity : AppCompatActivity() {
     private fun showEngine() {
         showOnly(R.id.stepEngine)
         val chip = SocInfo.name()
-        findViewById<TextView>(R.id.socText).text =
-            "Detected: $chip. " +
-                (if (SocInfo.hasNpuLikelihood()) "An NPU is likely — NNAPI will find it."
-                else "No NPU spotted — GPU or CPU will carry it.")
+        findViewById<TextView>(R.id.socText).text = chip.uppercase() +
+            (if (SocInfo.hasNpuLikelihood()) " · NPU LIKELY" else " · NO NPU SPOTTED")
+        card(R.id.rbAuto, "Auto", "Measured once, fastest wins")
+        card(R.id.rbNpu, "NPU", "NNAPI · idles the CPU")
+        card(R.id.rbGpu, "GPU", "Good fallback, warmer phone")
+        card(R.id.rbCpu, "CPU", "Works everywhere, slowest")
         when (AccelStore.get(this)) {
             Accel.AUTO -> R.id.rbAuto
             Accel.NPU -> R.id.rbNpu
@@ -126,6 +128,15 @@ class OnboardingActivity : AppCompatActivity() {
                 runOnUiThread { showVerdict(times) }
             }
         }
+    }
+
+    /** Two-line engine card: bold title, small mono subtitle. */
+    private fun card(id: Int, title: String, sub: String) {
+        val t = android.text.SpannableString("$title\n$sub")
+        t.setSpan(android.text.style.StyleSpan(android.graphics.Typeface.BOLD), 0, title.length, 0)
+        t.setSpan(android.text.style.RelativeSizeSpan(0.62f), title.length + 1, t.length, 0)
+        t.setSpan(android.text.style.TypefaceSpan("monospace"), title.length + 1, t.length, 0)
+        findViewById<android.widget.RadioButton>(id).text = t
     }
 
     private fun picked(): Accel =
@@ -172,46 +183,40 @@ class OnboardingActivity : AppCompatActivity() {
     /** The footprint moment: your chip, your numbers, one recommendation. */
     private fun showVerdict(times: Map<Accel, Double?>) {
         val fmt = { ms: Double? -> if (ms == null) "n/a" else String.format("%.1f ms", ms) }
-        findViewById<TextView>(R.id.benchText).text =
-            "NPU ${fmt(times[Accel.NPU])} · GPU ${fmt(times[Accel.GPU])} · CPU ${fmt(times[Accel.CPU])}"
-        val chip = SocInfo.name()
         val npu = times[Accel.NPU]
         val gpu = times[Accel.GPU]
         val cpu = times[Accel.CPU]
         val winner = times.filterValues { it != null }.minByOrNull { it.value!! }?.key
 
         val verdict = findViewById<TextView>(R.id.verdictText)
-        val take = findViewById<Button>(R.id.btnRecommend)
+        val hero = findViewById<TextView>(R.id.verdictHero)
+        hero.visibility = android.view.View.VISIBLE
         verdict.visibility = android.view.View.VISIBLE
-        take.visibility = android.view.View.VISIBLE
+        findViewById<TextView>(R.id.benchText).text =
+            "NPU ${fmt(npu)}  ·  GPU ${fmt(gpu)}  ·  CPU ${fmt(cpu)}\n${footprintLine()}"
 
-        val footprint = footprintLine()
+        // The measured winner is pre-selected; Continue is the one action.
         when {
             winner == Accel.NPU && cpu != null && npu != null -> {
-                val x = String.format("%.1f", cpu / npu)
-                verdict.text = "Your $chip NPU does this in ${fmt(npu)} — ${x}x faster " +
-                    "than CPU, and it sits idle all day. This workload is exactly what it is for.\n$footprint"
-                take.text = "Use my NPU"
-                take.setOnClickListener { choose(Accel.NPU) }
+                hero.text = String.format("%.1f×", cpu / npu)
+                verdict.text = "faster than your CPU. The NPU does it in ${fmt(npu)} and sits idle the rest of the day."
             }
             winner == Accel.GPU && npu != null && gpu != null -> {
-                verdict.text = "Plot twist, measured just now: your GPU (${fmt(gpu)}) beats " +
-                    "your NPU (${fmt(npu)}) on this workload. Take the faster lane.\n$footprint"
-                take.text = "Use my GPU"
-                take.setOnClickListener { choose(Accel.GPU) }
+                hero.text = fmt(gpu)
+                verdict.text = "Your GPU beats your NPU (${fmt(npu)}) on this model. Faster lane taken."
             }
             winner == Accel.CPU && cpu != null -> {
-                verdict.text = "No accelerator answered, so your CPU carries it at ${fmt(cpu)}. " +
-                    "Still fine — one small frame every 5 seconds.\n$footprint"
-                take.text = "Use CPU"
-                take.setOnClickListener { choose(Accel.CPU) }
+                hero.text = fmt(cpu)
+                verdict.text = "No accelerator answered, so the CPU carries it. One small frame every 5 seconds."
             }
             else -> {
-                verdict.text = "Could not measure cleanly. Auto will pick a working engine.\n$footprint"
-                take.text = "Stay on Auto"
-                take.setOnClickListener { choose(Accel.AUTO) }
+                hero.text = "Auto"
+                verdict.text = "Could not measure cleanly. Auto will pick a working engine."
             }
         }
+        findViewById<RadioGroup>(R.id.engineGroup).check(
+            when (winner) { Accel.NPU -> R.id.rbNpu; Accel.GPU -> R.id.rbGpu; Accel.CPU -> R.id.rbCpu; else -> R.id.rbAuto }
+        )
     }
 
     private fun footprintLine(): String {

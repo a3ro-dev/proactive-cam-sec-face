@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/tide"
+    android:fitsSystemWindows="true"
     android:fillViewport="true">
 
     <LinearLayout
@@ -67,116 +68,125 @@
             android:visibility="gone">
 
             <TextView
+                style="@style/Tide_Kicker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TIDE · SETUP 2 OF 3"
-                android:textColor="#D6DEFA"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.2" />
+                android:text="TIDE · SETUP 2 OF 3" />
 
             <TextView
+                style="@style/Tide_Head"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
-                android:text="Pick the engine."
-                android:textColor="#FFFFFF"
-                android:textSize="34sp"
-                android:textStyle="bold" />
+                android:text="Pick the engine." />
 
             <TextView
                 android:id="@+id/socText"
+                style="@style/Tide_Meta"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textColor="#D6DEFA"
-                android:textSize="15sp" />
+                android:layout_marginTop="10dp" />
+
+            <TextView
+                android:id="@+id/verdictHero"
+                style="@style/Tide_Hero"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/verdictText"
+                style="@style/Tide_Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/benchText"
+                style="@style/Tide_Meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp" />
 
             <RadioGroup
                 android:id="@+id/engineGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp">
+                android:layout_marginTop="14dp">
 
                 <RadioButton
                     android:id="@+id/rbAuto"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Auto (recommended)"
-                    android:textColor="#FFFFFF"
-                    android:textSize="17sp" />
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/engine_card"
+                    android:button="@null"
+                    android:minHeight="72dp"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="14dp"
+                    android:textColor="@color/engine_card_text"
+                    android:textSize="20sp" />
 
                 <RadioButton
                     android:id="@+id/rbNpu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="NPU · NNAPI"
-                    android:textColor="#FFFFFF"
-                    android:textSize="17sp" />
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/engine_card"
+                    android:button="@null"
+                    android:minHeight="72dp"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="14dp"
+                    android:textColor="@color/engine_card_text"
+                    android:textSize="20sp" />
 
                 <RadioButton
                     android:id="@+id/rbGpu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="GPU"
-                    android:textColor="#FFFFFF"
-                    android:textSize="17sp" />
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/engine_card"
+                    android:button="@null"
+                    android:minHeight="72dp"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="14dp"
+                    android:textColor="@color/engine_card_text"
+                    android:textSize="20sp" />
 
                 <RadioButton
                     android:id="@+id/rbCpu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="CPU"
-                    android:textColor="#FFFFFF"
-                    android:textSize="17sp" />
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/engine_card"
+                    android:button="@null"
+                    android:minHeight="72dp"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="14dp"
+                    android:textColor="@color/engine_card_text"
+                    android:textSize="20sp" />
             </RadioGroup>
-
-            <TextView
-                android:id="@+id/benchText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:textColor="#D6DEFA"
-                android:textSize="13sp"
-                android:fontFamily="monospace" />
-
-            <TextView
-                android:id="@+id/verdictText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:textColor="#FFFFFF"
-                android:textSize="17sp"
-                android:textStyle="bold"
-                android:visibility="gone" />
-
-            <Button
-                android:id="@+id/btnBench"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:backgroundTint="#00000000"
-                android:text="Test speed"
-                android:textColor="#FFFFFF" />
-
-            <Button
-                android:id="@+id/btnRecommend"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="8dp"
-                android:backgroundTint="@color/amber"
-                android:text="Use my NPU"
-                android:textColor="#1A1200"
-                android:visibility="gone" />
 
             <Button
                 android:id="@+id/btnEngineNext"
+                style="@style/Tide_Button"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="16dp"
-                android:backgroundTint="#FFFFFF"
-                android:text="Continue"
-                android:textColor="@color/tideDeep" />
+                android:layout_marginTop="24dp"
+                android:text="Continue" />
+
+            <Button
+                android:id="@+id/btnBench"
+                style="@style/Tide_Button.Ghost"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:text="Test speed again" />
         </LinearLayout>
 
         <!-- Step 3: capture -->
