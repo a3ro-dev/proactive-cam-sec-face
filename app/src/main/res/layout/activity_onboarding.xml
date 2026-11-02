@@ -221,12 +221,12 @@
                 android:layout_marginTop="10dp"
                 android:orientation="vertical">
 
-                <TextView android:id="@+id/move0" style="@style/Tide.Meta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="1 · Glasses on" android:textSize="13sp" />
-                <TextView android:id="@+id/move1" style="@style/Tide.Meta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="2 · Glasses off" android:textSize="13sp" />
-                <TextView android:id="@+id/move2" style="@style/Tide.Meta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="3 · Closer" android:textSize="13sp" />
-                <TextView android:id="@+id/move3" style="@style/Tide.Meta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="4 · Further, look left" android:textSize="13sp" />
-                <TextView android:id="@+id/move4" style="@style/Tide.Meta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="5 · Look right" android:textSize="13sp" />
-                <TextView android:id="@+id/move5" style="@style/Tide.Meta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="6 · Chin up and down" android:textSize="13sp" />
+                <TextView android:id="@+id/move0" style="@style/Tide_Meta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="1 · Glasses on" android:textSize="13sp" />
+                <TextView android:id="@+id/move1" style="@style/Tide_Meta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="2 · Glasses off" android:textSize="13sp" />
+                <TextView android:id="@+id/move2" style="@style/Tide_Meta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="3 · Closer" android:textSize="13sp" />
+                <TextView android:id="@+id/move3" style="@style/Tide_Meta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="4 · Further, look left" android:textSize="13sp" />
+                <TextView android:id="@+id/move4" style="@style/Tide_Meta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="5 · Look right" android:textSize="13sp" />
+                <TextView android:id="@+id/move5" style="@style/Tide_Meta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="6 · Chin up and down" android:textSize="13sp" />
             </LinearLayout>
 
             <TextView

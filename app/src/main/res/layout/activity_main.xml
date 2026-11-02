@@ -20,7 +20,7 @@
             android:gravity="center_vertical">
 
             <TextView
-                style="@style/Tide.Kicker"
+                style="@style/Tide_Kicker"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -42,7 +42,7 @@
 
         <TextView
             android:id="@+id/statusText"
-            style="@style/Tide.Hero"
+            style="@style/Tide_Hero"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -50,7 +50,7 @@
 
         <TextView
             android:id="@+id/detailText"
-            style="@style/Tide.Body"
+            style="@style/Tide_Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -68,7 +68,7 @@
 
         <TextView
             android:id="@+id/eventText"
-            style="@style/Tide.Body"
+            style="@style/Tide_Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -83,14 +83,14 @@
 
         <Button
             android:id="@+id/toggleButton"
-            style="@style/Tide.Button"
+            style="@style/Tide_Button"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:text="Start guard" />
 
         <Button
             android:id="@+id/adminButton"
-            style="@style/Tide.Button.Ghost"
+            style="@style/Tide_Button.Ghost"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="10dp"
@@ -98,7 +98,7 @@
 
         <Button
             android:id="@+id/enrollButton"
-            style="@style/Tide.Button.Ghost"
+            style="@style/Tide_Button.Ghost"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="10dp"
@@ -112,7 +112,7 @@
 
             <Button
                 android:id="@+id/updateButton"
-                style="@style/Tide.Button.Ghost"
+                style="@style/Tide_Button.Ghost"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -124,7 +124,7 @@
 
             <Button
                 android:id="@+id/aboutButton"
-                style="@style/Tide.Button.Ghost"
+                style="@style/Tide_Button.Ghost"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -132,7 +132,7 @@
         </LinearLayout>
 
         <TextView
-            style="@style/Tide.Meta"
+            style="@style/Tide_Meta"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
