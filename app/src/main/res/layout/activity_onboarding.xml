@@ -245,6 +245,16 @@
                 android:layout_height="320dp"
                 android:layout_marginTop="16dp" />
 
+            <TextView
+                android:id="@+id/faceHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Looking for your face…"
+                android:textColor="#D6DEFA"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
             <ProgressBar
                 android:id="@+id/captureProgress"
                 style="?android:attr/progressBarStyleHorizontal"

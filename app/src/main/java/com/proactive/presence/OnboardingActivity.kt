@@ -14,7 +14,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageProxy
 import androidx.camera.lifecycle.ProcessCameraProvider
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.FaceDetection
+import com.google.mlkit.vision.face.FaceDetectorOptions
 import androidx.camera.video.FileOutputOptions
 import androidx.camera.video.Quality
 import androidx.camera.video.QualitySelector
@@ -243,6 +248,21 @@ class OnboardingActivity : AppCompatActivity() {
         bindPreview()
     }
 
+    // Live face check: the checklist only means something if a face is
+    // actually in the frame. Throttled, fast detector, zero UI jank.
+    private val hintDetector by lazy {
+        FaceDetection.getClient(
+            FaceDetectorOptions.Builder()
+                .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+                .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_NONE)
+                .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_NONE)
+                .setMinFaceSize(0.25f)
+                .build()
+        )
+    }
+    private var lastHint = 0L
+
+    @androidx.camera.core.ExperimentalGetImage
     private fun bindPreview() {
         val fut = ProcessCameraProvider.getInstance(this)
         fut.addListener({
@@ -253,15 +273,43 @@ class OnboardingActivity : AppCompatActivity() {
                 .setQualitySelector(QualitySelector.from(Quality.SD))
                 .build()
             videoCapture = VideoCapture.withOutput(recorder)
+            val analysis = ImageAnalysis.Builder()
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .setTargetResolution(android.util.Size(640, 480))
+                .build()
+            analysis.setAnalyzer(bg) { proxy -> hintFrame(proxy) }
             try {
                 provider.unbindAll()
                 provider.bindToLifecycle(
-                    this, CameraSelector.DEFAULT_FRONT_CAMERA, preview, videoCapture
+                    this, CameraSelector.DEFAULT_FRONT_CAMERA, preview, videoCapture, analysis
                 )
             } catch (e: Exception) {
                 Toast.makeText(this, "Camera busy: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }, ContextCompat.getMainExecutor(this))
+    }
+
+    @androidx.camera.core.ExperimentalGetImage
+    private fun hintFrame(proxy: ImageProxy) {
+        try {
+            val now = System.currentTimeMillis()
+            if (now - lastHint < 700) return
+            lastHint = now
+            val media = proxy.image ?: return
+            hintDetector.process(InputImage.fromMediaImage(media, proxy.imageInfo.rotationDegrees))
+                .addOnSuccessListener { faces ->
+                    runOnUiThread {
+                        findViewById<TextView>(R.id.faceHint).text = if (faces.isEmpty()) {
+                            "No face in frame. Hold the phone upright, look at it."
+                        } else {
+                            "Face in frame. Hold still, follow the moves."
+                        }
+                    }
+                }
+        } catch (_: Exception) {
+        } finally {
+            proxy.close()
+        }
     }
 
     private fun startCapture() {
@@ -341,7 +389,10 @@ class OnboardingActivity : AppCompatActivity() {
                 runOnUiThread {
                     showOnly(R.id.stepCapture)
                     findViewById<Button>(R.id.btnRecord).isEnabled = true
-                    findViewById<TextView>(R.id.capturePrompt).text = e.message ?: "Try again."
+                    findViewById<Button>(R.id.btnRecord).text = "Try again"
+                    findViewById<TextView>(R.id.capturePrompt).text =
+                        "I couldn't see a face in that video. " +
+                            (e.message ?: "Hold the phone upright, keep your whole face in the frame.")
                 }
             }
         }
@@ -350,6 +401,7 @@ class OnboardingActivity : AppCompatActivity() {
     override fun onDestroy() {
         try { recording?.stop() } catch (_: Exception) {}
         handler.removeCallbacksAndMessages(null)
+        try { hintDetector.close() } catch (_: Exception) {}
         verifier.close()
         bg.shutdownNow()
         super.onDestroy()

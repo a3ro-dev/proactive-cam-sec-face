@@ -39,6 +39,11 @@ object EnrollHelper {
         val durMs = retriever.extractMetadata(
             MediaMetadataRetriever.METADATA_KEY_DURATION
         )?.toLongOrNull() ?: 30_000L
+        // Encoded frames are often landscape with a rotation tag the
+        // retriever ignores. Upright the face before anyone looks at it.
+        val rotation = retriever.extractMetadata(
+            MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION
+        )?.toIntOrNull() ?: 0
 
         val detector = FaceDetection.getClient(
             FaceDetectorOptions.Builder()
@@ -53,10 +58,14 @@ object EnrollHelper {
             val vecs = mutableListOf<FloatArray>()
             for (i in 0 until picks) {
                 val tUs = (durMs * 1000 * i / picks).coerceAtLeast(0)
-                val frame: Bitmap? = try {
+                var frame: Bitmap? = try {
                     retriever.getFrameAtTime(tUs, MediaMetadataRetriever.OPTION_CLOSEST)
                 } catch (_: Exception) {
                     null
+                }
+                if (frame != null && rotation != 0) {
+                    val m = android.graphics.Matrix().apply { postRotate(rotation.toFloat()) }
+                    frame = Bitmap.createBitmap(frame, 0, 0, frame.width, frame.height, m, true)
                 }
                 if (frame != null) {
                     embedFrame(detector, verifier, frame)?.let { vecs += it }
