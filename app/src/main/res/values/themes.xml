@@ -1,5 +1,0 @@
-<resources>
-    <style name="Theme.PresenceGuard" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/accent</item>
-    </style>
-</resources>
