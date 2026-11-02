@@ -20,8 +20,8 @@ object OwnerStore {
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
             .build()
         return EncryptedFile.Builder(
-            context,
             File(context.filesDir, NAME),
+            context,
             masterKey,
             EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
         ).build()

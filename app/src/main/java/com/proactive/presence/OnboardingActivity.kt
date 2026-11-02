@@ -200,7 +200,9 @@ class OnboardingActivity : AppCompatActivity() {
 
     private fun footprintLine(): String {
         val am = getSystemService(android.app.ActivityManager::class.java)
-        val gb = am.memoryInfo.totalMem / (1024 * 1024 * 1024)
+        val mi = android.app.ActivityManager.MemoryInfo()
+        am.getMemoryInfo(mi)
+        val gb = mi.totalMem / (1024 * 1024 * 1024)
         return "${SocInfo.name()} · Android ${android.os.Build.VERSION.RELEASE} · " +
             "${gb}GB RAM · measured on your phone, just now."
     }
@@ -260,8 +262,8 @@ class OnboardingActivity : AppCompatActivity() {
         ticking = true
         recording = vc.output
             .prepareRecording(this, FileOutputOptions.Builder(file).build())
-            .withAudioDisabled()
-            .start(ContextCompat.getMainExecutor(this)) { event ->
+            // Audio stays off: enrollment needs pictures, not sound.
+            .start(ContextCompat.getMainExecutor(this)) { event: VideoRecordEvent ->
                 if (event is VideoRecordEvent.Finalize) {
                     ticking = false
                     if (!event.hasError()) buildProfile(file.absolutePath)
