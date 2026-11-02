@@ -33,6 +33,12 @@ android {
     }
 
     buildTypes {
+        // Every CI build (debug included) uses the stable upload key, so
+        // phones update cleanly every time and OTA keeps working. Local
+        // builds without KEYSTORE_PATH keep the default debug key.
+        debug {
+            if (keystorePath != null) signingConfig = signingConfigs.getByName("ci")
+        }
         release {
             isMinifyEnabled = true
             proguardFiles(

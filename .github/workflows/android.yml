@@ -25,8 +25,19 @@ jobs:
           yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
           "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0"
 
+      - name: Restore upload keystore (same stable key as releases)
+        run: |
+          echo "$ANDROID_KEYSTORE_B64" | base64 -d > /tmp/presence.jks
+          test -s /tmp/presence.jks
+        env:
+          ANDROID_KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+
       - name: Build debug APK
         run: ./gradlew assembleDebug --stacktrace
+        env:
+          KEYSTORE_PATH: /tmp/presence.jks
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
